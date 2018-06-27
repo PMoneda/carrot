@@ -14,10 +14,11 @@
   version = "v4.2.1"
 
 [[projects]]
+  branch = "feature/topic-permissions"
   name = "github.com/michaelklishin/rabbit-hole"
   packages = ["."]
-  revision = "751d8f6874248f7243698c6f8377983879d744e9"
-  version = "v1.4.0"
+  revision = "1ffa18cc2b8dce965a836e8b1c72fa97e0ac8a20"
+  source = "github.com/PMoneda/rabbit-hole"
 
 [[projects]]
   name = "github.com/smartystreets/assertions"
@@ -48,6 +49,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "53927a44e92e5450e3e35d7831f348380eafd98cee632a010f2ac85be53ee9e0"
+  inputs-digest = "ee0393d75fc0d443d7ce9276e0439b2335fd07de8c248e7b50b773d5a0e949d9"
   solver-name = "gps-cdcl"
   solver-version = 1

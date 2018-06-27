@@ -10,7 +10,7 @@ import (
 type BrokerClient struct {
 	api    *rab.Client
 	client *amqp.Connection
-	config carrot.ConnectionConfig
+	config *carrot.ConnectionConfig
 }
 
 func (broker *BrokerClient) connectoToAmqp() (err error) {
@@ -27,7 +27,7 @@ func (broker *BrokerClient) connectoToAPI() (err error) {
 }
 
 //NewBrokerClient creates a new rabbit broker client
-func NewBrokerClient(config carrot.ConnectionConfig) (client *BrokerClient, err error) {
+func NewBrokerClient(config *carrot.ConnectionConfig) (client *BrokerClient, err error) {
 	client = new(BrokerClient)
 	client.config = config
 	err = client.connectoToAPI()

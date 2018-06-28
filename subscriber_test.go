@@ -1,15 +1,14 @@
-package rabbitmq
+package carrot
 
 import (
 	"testing"
 	"time"
 
-	"github.com/PMoneda/carrot"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestShouldSubscribeOnRabbit(t *testing.T) {
-	config := carrot.ConnectionConfig{
+	config := ConnectionConfig{
 		Host:     "localhost",
 		Username: "guest",
 		Password: "guest",
@@ -28,7 +27,7 @@ func TestShouldSubscribeOnRabbit(t *testing.T) {
 	builder.BindQueueToExchange(queue, exchange, "*")
 	builder.BindQueueToExchange("error_q", "error_ex", "*")
 
-	pub, _ := NewPublisher(conn)
+	pub := NewPublisher(conn)
 
 	Convey("should test subscriber", t, func() {
 

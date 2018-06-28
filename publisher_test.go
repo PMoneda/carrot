@@ -1,14 +1,13 @@
-package rabbitmq
+package carrot
 
 import (
 	"testing"
 
-	"github.com/PMoneda/carrot"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestRabbitPublish(t *testing.T) {
-	config := carrot.ConnectionConfig{
+	config := ConnectionConfig{
 		Host:     "localhost",
 		Username: "guest",
 		Password: "guest",
@@ -24,11 +23,7 @@ func TestRabbitPublish(t *testing.T) {
 	builder.BindQueueToExchange(queue, exchange, "*")
 
 	Convey("should publish message to rabbitmq", t, func() {
-		pub, errPublisher := NewPublisher(conn)
-
-		Convey("should create new publisher", func() {
-			So(errPublisher, ShouldBeNil)
-		})
+		pub := NewPublisher(conn)
 
 		Convey("should create vhost on rabbitmq", func() {
 

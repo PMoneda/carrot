@@ -1,10 +1,13 @@
-package rabbitmq
+package carrot
 
-import "github.com/streadway/amqp"
+import (
+	"fmt"
+
+	"github.com/streadway/amqp"
+)
 
 type Publisher struct {
-	client  *BrokerClient
-	channel *amqp.Channel
+	client *BrokerClient
 }
 
 //Message encapsulate some data configuration
@@ -17,24 +20,11 @@ type Message struct {
 
 //Publish a message to exchange in routingkey
 func (pub *Publisher) Publish(exchange, routingKey string, message Message) error {
-
-	err := pub.channel.Publish(
-		exchange,
-		routingKey,
-		false,
-		false,
-		amqp.Publishing{
-			Headers:         message.Headers,
-			ContentType:     message.ContentType,
-			ContentEncoding: message.Encoding,
-			Body:            message.Data,
-			DeliveryMode:    amqp.Persistent,
-			Priority:        0,
-		},
-	)
+	err := fmt.Errorf("begin")
+	var ch *amqp.Channel
 	for err != nil {
-		pub.channel, err = pub.client.Channel()
-		err = pub.channel.Publish(
+		ch, err = pub.client.Channel()
+		err = ch.Publish(
 			exchange,
 			routingKey,
 			false,
@@ -48,15 +38,17 @@ func (pub *Publisher) Publish(exchange, routingKey string, message Message) erro
 				Priority:        0,
 			},
 		)
+		if err != nil {
+			pub.client.channel.Close()
+			pub.client.channel = nil
+		}
 	}
 	return err
 }
 
 //NewPublisher creates a new broker publisher
-func NewPublisher(client *BrokerClient) (*Publisher, error) {
+func NewPublisher(client *BrokerClient) *Publisher {
 	pub := new(Publisher)
 	pub.client = client
-	ch, err := pub.client.client.Channel()
-	pub.channel = ch
-	return pub, err
+	return pub
 }

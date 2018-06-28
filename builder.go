@@ -1,4 +1,4 @@
-package rabbitmq
+package carrot
 
 import (
 	rab "github.com/michaelklishin/rabbit-hole"

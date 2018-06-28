@@ -1,15 +1,13 @@
-package rabbitmq
+package carrot
 
 import (
 	"testing"
-
-	"github.com/PMoneda/carrot"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestShouldBuildRabbitInfra(t *testing.T) {
-	config := carrot.ConnectionConfig{
+	config := ConnectionConfig{
 		Host:     "localhost",
 		Username: "guest",
 		Password: "guest",

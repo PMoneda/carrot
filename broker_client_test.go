@@ -1,16 +1,14 @@
-package rabbitmq
+package carrot
 
 import (
 	"testing"
-
-	"github.com/PMoneda/carrot"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestShouldConnectToRabbit(t *testing.T) {
 	Convey("should connect to rabbitmq api", t, func() {
-		connConfig := &carrot.ConnectionConfig{
+		connConfig := &ConnectionConfig{
 			Host:     "localhost",
 			Username: "guest",
 			Password: "guest",
@@ -23,7 +21,7 @@ func TestShouldConnectToRabbit(t *testing.T) {
 	})
 
 	Convey("should not connect to rabbitmq api", t, func() {
-		connConfig := &carrot.ConnectionConfig{
+		connConfig := &ConnectionConfig{
 			Host:     "localhos",
 			Username: "guest",
 			Password: "guest",
@@ -34,7 +32,7 @@ func TestShouldConnectToRabbit(t *testing.T) {
 	})
 
 	Convey("should not create api client when url cannot be parsed", t, func() {
-		connConfig := &carrot.ConnectionConfig{
+		connConfig := &ConnectionConfig{
 			Host:     "localh*& os",
 			Username: "guest",
 			Password: "guest",

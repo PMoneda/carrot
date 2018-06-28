@@ -1,6 +1,8 @@
 package rabbitmq
 
 import (
+	"time"
+
 	"github.com/PMoneda/carrot"
 	rab "github.com/michaelklishin/rabbit-hole"
 	"github.com/streadway/amqp"
@@ -14,6 +16,9 @@ type BrokerClient struct {
 }
 
 func (broker *BrokerClient) connectoToAmqp() (err error) {
+	if broker.client != nil {
+		broker.client.Close()
+	}
 	broker.client, err = amqp.Dial(broker.config.GetAMQPURI())
 	return
 }
@@ -22,6 +27,20 @@ func (broker *BrokerClient) connectoToAPI() (err error) {
 	broker.api, err = rab.NewClient(broker.config.GetAPIURI(), broker.config.Username, broker.config.Password)
 	if err != nil {
 		return
+	}
+	return
+}
+
+//Channel return amqp channel with reconnect capabilities
+func (broker *BrokerClient) Channel() (ch *amqp.Channel, err error) {
+	times := 0
+	for ch == nil || times == 10 {
+		ch, err = broker.client.Channel()
+		if err != nil {
+			time.Sleep(100 * time.Millisecond)
+			err = broker.connectoToAmqp()
+			times++
+		}
 	}
 	return
 }

@@ -13,8 +13,16 @@ type Builder struct {
 func (builder *Builder) UseVHost(vhost string) error {
 	_, err := builder.client.api.PutVhost(vhost, rab.VhostSettings{Tracing: false})
 	if err == nil {
-		builder.client.config.VHost = vhost
-		builder.client.connectoToAPI()
+		_, err = builder.client.api.UpdatePermissionsIn(vhost, builder.client.config.Username, rab.Permissions{
+			Configure: ".*",
+			Read:      ".*",
+			Write:     ".*",
+		})
+		if err == nil {
+			builder.client.config.VHost = vhost
+			builder.client.connectoToAPI()
+			builder.client.connectoToAmqp()
+		}
 	}
 	return err
 }
@@ -70,6 +78,16 @@ func (builder *Builder) BindQueueToExchange(queue, exchange, routingKey string) 
 		Source:          exchange,
 		Destination:     queue,
 		DestinationType: "queue",
+	})
+	return err
+}
+
+//UpdateTopicPermission updates or create a new topic permission
+func (builder *Builder) UpdateTopicPermission(user, exchange string) error {
+	_, err := builder.client.api.UpdateTopicPermissionsIn(builder.client.config.VHost, user, rab.TopicPermission{
+		Exchange: exchange,
+		Read:     ".*",
+		Write:    ".*",
 	})
 	return err
 }

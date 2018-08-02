@@ -23,7 +23,7 @@ func (pub *Publisher) Publish(exchange, routingKey string, message Message) erro
 	err := fmt.Errorf("begin")
 	var ch *amqp.Channel
 	for err != nil {
-		ch, err = pub.client.Channel()
+		ch, err = pub.client.client.Channel()
 		if err == nil {
 			err = ch.Publish(
 				exchange,
@@ -39,6 +39,9 @@ func (pub *Publisher) Publish(exchange, routingKey string, message Message) erro
 					Priority:        0,
 				},
 			)
+			if err == nil {
+				ch.Close()
+			}
 		}
 	}
 	return err

@@ -1,6 +1,8 @@
 package carrot
 
 import (
+	"fmt"
+
 	rab "github.com/michaelklishin/rabbit-hole"
 	"github.com/streadway/amqp"
 )
@@ -31,8 +33,14 @@ func (broker *BrokerClient) connectoToAPI() (err error) {
 
 //Channel return amqp channel with reconnect capabilities
 func (broker *BrokerClient) Channel() (ch *amqp.Channel, err error) {
+	errClose := broker.channel.Close()
+	if errClose != nil {
+		fmt.Println(errClose)
+	}
 	ch, err = broker.client.Channel()
-	broker.channel = ch
+	if err == nil {
+		broker.channel = ch
+	}
 	return
 }
 

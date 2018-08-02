@@ -102,41 +102,42 @@ func (sub *Subscriber) Subscribe(worker SubscribeWorker) error {
 func messageHandler(worker SubscribeWorker, msgsChan <-chan amqp.Delivery, channel *amqp.Channel, sub *Subscriber) {
 	notifyCloseChannel := channel.NotifyClose(make(chan *amqp.Error))
 	notifyClientConnectionClose := sub.client.client.NotifyClose(make(chan *amqp.Error))
-	//panic(fmt.Errorf("asdas"))
-	select { //check connection
-	case <-notifyClientConnectionClose:
-		fmt.Println("Closed client connection")
-		break
-	case <-notifyCloseChannel:
-		//work with error
-		fmt.Println("Closed Channel recover connection")
-		ch, err := sub.client.client.Channel()
-		if err == nil {
-			msgs, err := ch.Consume(
-				worker.Queue,   // queue
-				"",             // consumer
-				worker.AutoAck, // auto-ack
-				false,          // exclusive
-				false,          // no-local
-				false,          // no-wait
-				nil,            // args
-			)
+	for {
+		select { //check connection
+		case <-notifyClientConnectionClose:
+			fmt.Println("Closed client connection")
+			break
+		case <-notifyCloseChannel:
+			//work with error
+			fmt.Println("Closed Channel recover connection")
+			ch, err := sub.client.client.Channel()
 			if err == nil {
-				go messageHandler(worker, msgs, ch, sub)
+				msgs, err := ch.Consume(
+					worker.Queue,   // queue
+					"",             // consumer
+					worker.AutoAck, // auto-ack
+					false,          // exclusive
+					false,          // no-local
+					false,          // no-wait
+					nil,            // args
+				)
+				if err == nil {
+					go messageHandler(worker, msgs, ch, sub)
+				}
 			}
+			break //reconnect
+		case message := <-msgsChan:
+			context := new(MessageContext)
+			context.channel = channel
+			context.Message = Message{
+				ContentType: message.ContentType,
+				Data:        message.Body,
+				Encoding:    message.ContentEncoding,
+			}
+			context.delivery = message
+			context.subscriber = sub
+			worker.Handler(context)
 		}
-		break //reconnect
-	case message := <-msgsChan:
-		context := new(MessageContext)
-		context.channel = channel
-		context.Message = Message{
-			ContentType: message.ContentType,
-			Data:        message.Body,
-			Encoding:    message.ContentEncoding,
-		}
-		context.delivery = message
-		context.subscriber = sub
-		worker.Handler(context)
 	}
 
 }

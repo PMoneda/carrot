@@ -81,9 +81,6 @@ func (sub *Subscriber) Subscribe(worker SubscribeWorker) error {
 			if err == nil {
 				go messageHandler(worker, msgs)
 			}
-		} else {
-			sub.client.channel = nil
-			i--
 		}
 	}
 	return nil
